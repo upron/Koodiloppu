@@ -1,0 +1,5 @@
+SAIH1,Sasha,Ihamäki,0441234567,sasha.ihamaki@edu.turkuamk.fi
+JALA5,Jani,Laaksonen,0401234567,jani.laaksonen@edu.turkuamk.fi
+SAKU4,Sakke,Kuusinen,0447654321,sakke.kuusinen@luukku.com
+REKA8,Rehti,Kaveri,0409876543,rehtireiska99@suomi24.fi
+KAKU2,Kalevi,Kuusela,0501234567,kartsakuusi66@ovi.com

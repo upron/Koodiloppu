@@ -1,16 +1,25 @@
+import random
+
+# Tämä ohjelma hallitsee yhteystietojen lisäämistä, näyttämistä, hakemista, muokkaamista ja poistamista.
+# Se käyttää tiedostoa tietojen tallentamiseen ja lukemiseen.
+# Ohjelma kysyy käyttäjältä valintoja ja suorittaa niihin liittyvät toiminnot.
+
 def kysy_valinta():
+    # Kysytään käyttäjältä valinta.
     return int(input("Valitse toiminto:\n" \
     "1: Lisää yhteystieto\n" \
     "2: Näytä kaikki yhteystiedot\n" \
     "3: Hae yhteystieto\n" \
     "4: Muokkaa yhteystietoa\n" \
     "5: Poista yhteystieto\n" \
-    "6: Poistu ohjelmasta\n" \
+    "6: Hae puutteelliset yhteystiedot\n" \
+    "7: Poistu ohjelmasta\n" \
     "Valintasi: "))
 
 def main():
+    # Pääohjelma, joka hallitsee yhteystietojen käsittelyä.
     valinta = kysy_valinta()
-    while valinta != 6:
+    while valinta != 7:  # Updated exit condition
         if valinta == 1:
             lisaa_yhteystieto()
         elif valinta == 2:
@@ -21,6 +30,8 @@ def main():
             muokkaa_yhteystietoa()
         elif valinta == 5:
             poista_yhteystieto()
+        elif valinta == 6:
+            hae_puutteelliset_yhteystiedot()  # New option
         else:
             print("Virheellinen valinta, yritä uudelleen.")
         
@@ -28,16 +39,21 @@ def main():
     print("Poistutaan ohjelmasta.")
 
 def lisaa_yhteystieto():
-    nimi = input("Anna nimesi: ")
+    # Kysytään käyttäjältä yhteystiedot ja tallennetaan ne tiedostoon.
+    etunimi = input("Anna etunimesi: ")
+    sukunimi = input("Anna sukunimesi: ")
     puhelin = input("Anna puhelinnumerosi: ")
     email = input("Anna sähköpostiosoitteesi: ")
+    id_numero = random.randint(1, 9)
+    id = f"{etunimi[:2].upper()}{sukunimi[:2].upper()}{id_numero}"
     
     with open("yhteystiedot.txt", "a") as tiedosto:
-        tiedosto.write(f"{nimi},{puhelin},{email}\n")
+        tiedosto.write(f"{id},{etunimi},{sukunimi},{puhelin},{email}\n")
     
-    print("Yhteystieto lisätty onnistuneesti.")
+    print(f"Yhteystieto lisätty onnistuneesti. ID: {id}")
 
 def nayta_yhteystiedot():
+    # Näytetään kaikki yhteystiedot tiedostosta.
     try:
         with open("yhteystiedot.txt", "r") as tiedosto:
             yhteystiedot = tiedosto.readlines()
@@ -48,40 +64,49 @@ def nayta_yhteystiedot():
         
         print("Kaikki yhteystiedot:")
         for rivi in yhteystiedot:
-            nimi, puhelin, email = rivi.strip().split(",")
-            print(f"Nimi: {nimi}, Puhelin: {puhelin}, Sähköposti: {email}")
+            id, etunimi, sukunimi, puhelin, email = rivi.strip().split(",")
+            print(f"ID: {id}, Nimi: {etunimi} {sukunimi}, Puhelin: {puhelin}, Sähköposti: {email}")
     except FileNotFoundError:
         print("Yhteystietotiedostoa ei löydy.")
 
 def hae_yhteystieto():
-    nimi = input("Anna haettavan henkilön nimi: ")
+    # Haetaan tietty yhteystieto hakusanalla.
+    hakusana = input("Anna hakusana: ").lower()
     
     try:
         with open("yhteystiedot.txt", "r") as tiedosto:
             yhteystiedot = tiedosto.readlines()
         
+        osumat = []
         for rivi in yhteystiedot:
-            if rivi.startswith(nimi):
-                print(f"Löydetty yhteystieto: {rivi.strip()}")
-                return
-        print("Yhteystietoa ei löytynyt.")
+            if hakusana in rivi.lower():
+                osumat.append(rivi.strip())
+        
+        if osumat:
+            print("Löydetyt yhteystiedot:")
+            for osuma in osumat:
+                print(osuma)
+        else:
+            print("Yhteystietoa ei löytynyt.")
     except FileNotFoundError:
         print("Yhteystietotiedostoa ei löydy.")
 
 def muokkaa_yhteystietoa():
-    nimi = input("Anna muokattavan henkilön nimi: ")
+    # Muokataan olemassa olevaa yhteystietoa.
+    muokattava_id = input("Anna muokattavan henkilön ID: ")
     
     try:
         with open("yhteystiedot.txt", "r") as tiedosto:
             yhteystiedot = tiedosto.readlines()
         
         for i, rivi in enumerate(yhteystiedot):
-            if rivi.startswith(nimi):
-                uusi_nimi = input("Anna uusi nimi: ")
-                uusi_puhelin = input("Anna uusi puhelinnumero: ")
-                uusi_email = input("Anna uusi sähköpostiosoite: ")
+            if rivi.startswith(muokattava_id):
+                etunimi = input("Anna uusi etunimi: ")
+                sukunimi = input("Anna uusi sukunimi: ")
+                puhelin = input("Anna uusi puhelinnumero: ")
+                email = input("Anna uusi sähköpostiosoite: ")
                 
-                yhteystiedot[i] = f"{uusi_nimi},{uusi_puhelin},{uusi_email}\n"
+                yhteystiedot[i] = f"{muokattava_id},{etunimi},{sukunimi},{puhelin},{email}\n"
                 
                 with open("yhteystiedot.txt", "w") as tiedosto:
                     tiedosto.writelines(yhteystiedot)
@@ -93,14 +118,15 @@ def muokkaa_yhteystietoa():
         print("Yhteystietotiedostoa ei löydy.")
 
 def poista_yhteystieto():
-    nimi = input("Anna poistettavan henkilön nimi: ")
+    # Poistetaan yhteystieto tiedostosta.
+    poistettava_id = input("Anna poistettavan henkilön ID: ")
     
     try:
         with open("yhteystiedot.txt", "r") as tiedosto:
             yhteystiedot = tiedosto.readlines()
         
         for i, rivi in enumerate(yhteystiedot):
-            if rivi.startswith(nimi):
+            if rivi.startswith(poistettava_id):
                 del yhteystiedot[i]
                 
                 with open("yhteystiedot.txt", "w") as tiedosto:
@@ -109,6 +135,27 @@ def poista_yhteystieto():
                 print("Yhteystieto poistettu onnistuneesti.")
                 return
         print("Yhteystietoa ei löytynyt.")
+    except FileNotFoundError:
+        print("Yhteystietotiedostoa ei löydy.")
+
+def hae_puutteelliset_yhteystiedot():
+    # Haetaan yhteystiedot, joissa on puutteellisia kenttiä.
+    try:
+        with open("yhteystiedot.txt", "r") as tiedosto:
+            yhteystiedot = tiedosto.readlines()
+        
+        puutteelliset = []
+        for rivi in yhteystiedot:
+            kentat = rivi.strip().split(",")
+            if len(kentat) < 5 or any(not kentta.strip() for kentta in kentat):
+                puutteelliset.append(rivi.strip())
+        
+        if puutteelliset:
+            print("Puutteelliset yhteystiedot:")
+            for puutteellinen in puutteelliset:
+                print(puutteellinen)
+        else:
+            print("Ei puutteellisia yhteystietoja.")
     except FileNotFoundError:
         print("Yhteystietotiedostoa ei löydy.")
 
